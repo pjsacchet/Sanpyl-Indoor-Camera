@@ -25,6 +25,9 @@ CONNECT_COMMAND_PORT =b'\xb8\x22' # next two bytes are for our port number (litt
 CONNECT_COMMAND_IP = b'\x01\x89\xa8\xc0' # next four bytes are for our ip address (little endian) (192.168.137.1)
 CONNECT_COMMAND_FOOTER = b'\x00\x00\x00\x00\x00\x00\x00\x00' # last 8 bytes are all 0
 
+# Maybe an auth blob? idk
+AUTH_BLOB = b'x\f1\xd0\x00\x48\xd1\x00\x00\x00\x02\x80\x00\x00\x3c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x61\x75\x77\x59\x72\x38\x74\x74\x43\x59\x53\x43\x61\x79\x39\x6b\x6e\x52\x54\x7a\x50\x79\x4a\x47\x4e\x69\x54\x31\x54\x6d\x6c\x34\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+
 # Supposed 'keep alive' bytes 
     # Our phone app alternates between these two packets 
 KEEP_ALIVE_1 = b'\xf1\xe1\x00\x00'
@@ -146,6 +149,11 @@ def main():
 
     # Establish our own socket we'll use for sending 
     sock = establishSocket()
+
+    # Send this 'auth blob' type thing we always send on connect 
+    sock.sendto(AUTH_BLOB, (target_ip, int(port)))
+
+    # Send ok after we get the all clear?
 
     # Now tell the robot to reach out to us, and establish a socket to listen for data 
         # A lot of data we receive will need to be echoed back I fear
