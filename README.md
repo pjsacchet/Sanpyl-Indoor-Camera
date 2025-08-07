@@ -1,6 +1,8 @@
 # Sanpyl-Indoor-Camera
 A brief analysis of the Sanpyl-Indoor-Camera, a self-delcared 'IoT smart security camera' that offers a mobile app with integrated video feed and movement for said device.This report will explore both the hardware and software aspects of this device to include the methods and approaches taken in addition to those vulnerabilities that were exploited. 
 
+<img src="Screenshots/Robot.png" alt="alt text" width="300"/>
+
 Product Link: https://www.amazon.com/dp/B0CJFRC9HT
 
 ## Table of Contents
