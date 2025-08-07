@@ -53,7 +53,7 @@ def constructDirectionCommandPacket(direction: Direction) -> bytes:
     packet = b''
     global DIRECTION_COMMAND_COUTNER
 
-    counter_bytes = DIRECTION_COMMAND_COUTNER.to_bytes(2, 'little')
+    counter_bytes = DIRECTION_COMMAND_COUTNER.to_bytes(2, 'big')
 
     # Build everything thats the same for our packet
         # TODO: change HEADER_RAND to counter we increment 
