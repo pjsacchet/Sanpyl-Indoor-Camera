@@ -116,7 +116,7 @@ def receiveData():
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        sock.bind("0.0.0.0", 8888)
+        sock.bind(("0.0.0.0", 8888))
 
         while True:
             data, addr = sock.recvfrom(1024)
@@ -132,13 +132,14 @@ def main():
     target_ip = input("Input target ip > ")
     port = input("Input target port > ")
 
-    sock = establishSocket()
-
     # Spin up a listener thread to get everything the bot sends us 
     print("Spinning up listening thread...")
     listen_thread = threading.Thread(target=receiveData)
 
     listen_thread.start()
+
+    # Establish our own socket we'll use for sending 
+    sock = establishSocket()
 
     # Now tell the robot to reach out to us, and establish a socket to listen for data 
         # A lot of data we receive will need to be echoed back I fear
