@@ -2,7 +2,7 @@
 # This script serves to explore possible approaches following network analysis of movement commands sent to the Sanpyl-Indoor-Camera
 
 # This script requires that the actor knows what the active listening port is on the device; they must watch network traffic 
-    # in order to determine this. Otherwise, we will be get a destination unreachable error'
+    # in order to determine this. Otherwise, we will be get a 'destination unreachable error'
     # The device changes port approx. every 5 minutes, sending packets confirming this roughly every 32 seconds 
 
 # TODO:
@@ -15,6 +15,8 @@ import threading
 from pynput import keyboard
 from enum import Enum
 
+DIRECTION_COMMAND_COUTNER = 0
+
 # Initial 'connect to us' command (20 bytes)
     # We need to specify our port and ip address so the robot reaches out to us
     # TODO: change connect command ip to user configured 
@@ -23,8 +25,6 @@ CONNECT_COMMAND_PORT =b'\xb8\x22' # next two bytes are for our port number (litt
 CONNECT_COMMAND_IP = b'\x01\x89\xa8\xc0' # next four bytes are for our ip address (little endian) (192.168.137.1)
 CONNECT_COMMAND_FOOTER = b'\x00\x00\x00\x00\x00\x00\x00\x00' # last 8 bytes are all 0
 
-
-
 # Supposed 'keep alive' bytes 
     # Our phone app alternates between these two packets 
 KEEP_ALIVE_1 = b'\xf1\xe1\x00\x00'
@@ -32,7 +32,7 @@ KEEP_ALIVE_2 = b'\xf1\xe0\x00\x00'
 
 # Define the different sections of our 36 byte payload 
 HEADER = b'\xF1\xd0\x00\x20\xd1\x00' # From our analysis only the first 6 bytes are the same for some reason
-HEADER_RAND = b'\x00\x49' # Random two bytes.. idk (serves as a counter?)
+HEADER_RAND = b'\x00\x00' # Random two bytes.. idk (serves as a counter?)
 BODY = b'\x00\x10\x00\x00\x14\x00\x00\x00' # Next 8 bytes are the same
 # The following 8 bytes are direction dependent
 UP_COMMAND = b'\x00\x00\x00\x00\x0a\x00\x00\x00'
@@ -51,10 +51,13 @@ class Direction(Enum):
 # Build out a packet to tell our robot to move its head up, down, left or right 
 def constructDirectionCommandPacket(direction: Direction) -> bytes:
     packet = b''
+    global DIRECTION_COMMAND_COUTNER
+
+    counter_bytes = DIRECTION_COMMAND_COUTNER.to_bytes(2, 'little')
 
     # Build everything thats the same for our packet
         # TODO: change HEADER_RAND to counter we increment 
-    packet+= HEADER + HEADER_RAND + BODY
+    packet+= HEADER + counter_bytes + BODY
 
     match direction:
         case Direction.UP:
@@ -67,6 +70,8 @@ def constructDirectionCommandPacket(direction: Direction) -> bytes:
             packet += RIGHT_COMMAND
 
     packet += FOOTER
+    # Increment our counter for next command 
+    DIRECTION_COMMAND_COUTNER += 1
     return packet
 
 def constructConnectCommandPacket() -> bytes:
@@ -120,13 +125,14 @@ def receiveData():
 
         while True:
             data, addr = sock.recvfrom(1024)
-            print("Recevied " + str(data) + " from " + str(addr))
+            print("Recevied " + str(data) + " from " + str(addr[0]) + " on port " + str(addr[1]))
+            sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device 
     except socket.error as e:
         print("ERROR: Failed listener socket " + str(e))
 
     return
 
-
+# Do all the things!
 def main():
     # Grab the target ip and desired port (if any) from user
     target_ip = input("Input target ip > ")
@@ -148,6 +154,7 @@ def main():
     # Keep taking input from user, use arrow keys to map to head movement 
     with keyboard.Listener(on_press=lambda event:onPress(event, target_ip=target_ip, port=int(port), sock=sock)) as listener:
         listener.join()
+        listen_thread.join()
         
 
 if __name__ == '__main__':
