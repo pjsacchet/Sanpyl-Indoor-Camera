@@ -17,6 +17,14 @@ Product Link: https://www.amazon.com/dp/B0CJFRC9HT
 ## Introduction
 
 ## Research Goals
+In pursuing this IoT device, there were a few questions and goals I had in mind to help guide this work:
+- What hardware composed this device?
+- Is the firmware easily extractable? 
+  - If so, what vulnerabilities exist within the firmware?
+- What vulnerabilities existed, if any, in the mobile application?
+- What ports/services were open and accessible on the device?
+- Is it possible for a malicous actor to intercept video/audio on the device?
+- Is it possible for a malicious actor to send commands of their own to move the device?
 
 ## Research Method
 
