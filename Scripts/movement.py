@@ -12,6 +12,7 @@
 
 import socket
 import threading
+import time
 from pynput import keyboard
 from enum import Enum
 
@@ -153,6 +154,8 @@ def main():
     # Now tell the robot to reach out to us, and establish a socket to listen for data 
         # A lot of data we receive will need to be echoed back I fear
     sock.sendto(constructConnectCommandPacket(), (target_ip, int(port)))
+
+    time.sleep(5) # wait to send our auth blob
 
     # Send this 'auth blob' type thing we always send on connect 
     sock.sendto(AUTH_BLOB, (target_ip, int(port)))
