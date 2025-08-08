@@ -190,11 +190,17 @@ def receiveData():
                 #sock.sendto(MID_PACKET, (addr[0], int(addr[1])))
                 # Try sending our own success?
                 sock.sendto(AUTH_SUCCESS_1, (addr[0], int(addr[1])))
+                sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
             elif (data == MID_PACKET_2):
                 print("Weird 16 byte packet recevied; echoing back...")
                 #sock.sendto(MID_PACKET_2, (addr[0], int(addr[1])))
                 # Try sending our own success?
                 sock.sendto(AUTH_SUCCESS_1, (addr[0], int(addr[1])))
+                sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
+            elif (data == AUTH_SUCCESS_1):
+                print("AUTH SUCCESS PACKET DETECTED!")
+                sock.sendto(AUTH_SUCCESS_1, (addr[0], int(addr[1])))
+                sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
             # Dont echo back anything else
             else:
                 print("Not sure what this is: " + str(data))   
