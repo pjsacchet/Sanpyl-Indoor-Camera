@@ -264,6 +264,9 @@ def receiveData():
                 sock.sendto(CONTROL_NEXT_2, (addr[0], int(addr[1])))
                 print("Sending our own control back....")
                 sock.sendto(CONTROL_US, (addr[0], int(addr[1])))
+            elif (len(data) <= 32):
+                print("Echoing dummy data back to device...")
+                sock.sendto(data, (addr[0], int(addr[1])))
             # Dont echo back anything else
             #else:
                 #print("Not sure what this is: " + str(data))   
