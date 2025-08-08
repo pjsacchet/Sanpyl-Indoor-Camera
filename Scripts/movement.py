@@ -91,6 +91,7 @@ CONTROL_START = b'\xf1\xd1\x00\x0a\xd1\x00\x00\x03\x00\x01\x00\x02\x00\x01'
 
 # Next 12 bytes it seems to send (echo it?)
 CONTROL_NEXT = b'\xf1\xd1\x00\x08\xd1\x00\x00\x02\x00\x01\x00\x01'
+CONTROL_NEXT_2 = b'\xf1\xd1\x00\x08\xd1\x00\x00\x02\x00\x01\x00\x02' # variation?
 
 class Direction(Enum):
     UP = 1
@@ -255,6 +256,9 @@ def receiveData():
             elif (data == CONTROL_NEXT):
                 print("Control next detected...")
                 sock.sendto(CONTROL_NEXT, (addr[0], int(addr[1])))
+            elif (data == CONTROL_NEXT_2):
+                print("Control next 2 variation detected...")
+                sock.sendto(CONTROL_NEXT_2, (addr[0], int(addr[1])))
             # Dont echo back anything else
             #else:
                 #print("Not sure what this is: " + str(data))   
