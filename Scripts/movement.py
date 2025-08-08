@@ -26,6 +26,9 @@ SENT_KEEP_ALIVE = False
 
 AUTH_DONE = False
 
+# Device seems to like to send 3 blobs before we respond?
+COMMAND_BLOBS_SENT = 0
+
 # Initial 'connect to us' command (20 bytes)
     # We need to specify our port and ip address so the robot reaches out to us
     # TODO: change connect command ip to user configured 
@@ -149,6 +152,7 @@ def receiveData():
     global SENT_KEEP_ALIVE
     global AUTH_DONE
     global RESPONDED_TO_STARTUP
+    global COMMAND_BLOBS_SENT
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -164,14 +168,17 @@ def receiveData():
                 print("Returning keep alive...")
                 sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device 
             elif (data == SEND_AUTH_COMMAND):
+                print("Adding one more auth blob...")
+                COMMAND_BLOBS_SENT += 1
+                if (COMMAND_BLOBS_SENT == 4):
+                    # Start off by sending three keep alives, I think the device expects these I guess (if we havent sent this already)
+                    if (not SENT_KEEP_ALIVE):
+                        print("Sending initial keep alive...")
+                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                        SENT_KEEP_ALIVE = True
                 print("Sending auth blob...")
-                # Start off by sending three keep alives, I think the device expects these I guess (if we havent sent this already)
-                if (not SENT_KEEP_ALIVE):
-                    print("Sending initial keep alive...")
-                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                    SENT_KEEP_ALIVE = True
                 sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
             elif (data == AUTH_ACCEPTED):
                 print("Auth accepted!")
