@@ -177,7 +177,7 @@ def receiveData():
         sock.bind(("0.0.0.0", 8888))
 
         while (not TERMINATE):
-            data, addr = sock.recvfrom(1024)
+            data, addr = sock.recvfrom(1032)
             #print("Recevied " + str(data) + " from " + str(addr[0]) + " on port " + str(addr[1]))
             # Check for our special 'send auth' flag
             # Only start sending back keep alives if we're done with our auth sequence 
