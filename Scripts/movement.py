@@ -183,11 +183,11 @@ def receiveData():
                         sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
                         sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
                         SENT_KEEP_ALIVE = True
-                    print("Sending auth blobs...")
+                    print("Sending auth blob...")
                     sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
-                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
-                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
-                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
+                    #sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
+                    #sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
+                    #sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
                     # TODO: we still send more responses from our phone, not sure if we have to do that here...
             elif (data == AUTH_ACCEPTED):
                 print("Auth accepted!")
@@ -216,7 +216,7 @@ def receiveData():
             elif (data == AUTH_SUCCESS_1):
                 print("AUTH SUCCESS PACKET DETECTED!")
                 # send our auth one more time 
-                #sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
+                sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
                 sock.sendto(AUTH_SUCCESS_1, (addr[0], int(addr[1])))
             elif (data == AUTH_SUCCESS_2):
                 sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
