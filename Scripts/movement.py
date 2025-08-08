@@ -39,13 +39,14 @@ STARTUP_PACKET = b'\xf1\x41\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\
 
 MID_PACKET = b'\xf1\xd1\x00\x0a\xd1\x00\x00\x03\x00\x00\x00\x00\x00\x00'
 MID_PACKET_2 = b'\xf1\xd1\x00\x0c\xd1\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00'
+# Weird 10 and 12 byte blobs I've seen sent from our phone and device
+AUTH_SUCCESS_1 = b'\xf1\xd1\x00\x06\xd1\x00\x00\x01\x00\x00'
+AUTH_SUCCESS_2 = b'\xf1\xd1\x00\x08\xd1\x00\x00\x02\x00\x00\x00\x00'
 
 # I think the device may prompt us to send auth with this message, dont echo it 
 SEND_AUTH_COMMAND = b'\xf1\x42\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
 # This seems to be send from the device after sending our auth blob 
 AUTH_ACCEPTED = b'\xf1\xd0\x00\x14\xd1\x00\x00\x00\x03\x80\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x3c\x00\x00\x00'
-# Weird follow up auth blob?
-AUTH_CONTINUE = b''
 
 # Maybe an auth blob? idk
 AUTH_BLOB = b'\xf1\xd0\x00\x48\xd1\x00\x00\x00\x02\x80\x00\x00\x3c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x61\x75\x77\x59\x72\x38\x74\x74\x43\x59\x53\x43\x61\x79\x39\x6b\x6e\x52\x54\x7a\x50\x79\x4a\x47\x4e\x69\x54\x31\x54\x6d\x6c\x34\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
@@ -187,9 +188,13 @@ def receiveData():
             elif (data == MID_PACKET):
                 print("Weird 14 byte packet received; echoing back...")
                 sock.sendto(MID_PACKET, (addr[0], int(addr[1])))
+                # Try sending our own success?
+                sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
             elif (data == MID_PACKET_2):
                 print("Weird 16 byte packet recevied; echoing back...")
                 sock.sendto(MID_PACKET_2, (addr[0], int(addr[1])))
+                # Try sending our own success?
+                sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
             # Dont echo back anything else
             else:
                 print("Not sure what this is: " + str(data))   
