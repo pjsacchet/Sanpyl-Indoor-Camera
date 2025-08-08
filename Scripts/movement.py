@@ -22,6 +22,8 @@ DIRECTION_COMMAND_COUTNER = 0
 
 SENT_KEEP_ALIVE = False
 
+AUTH_DONE = False
+
 # Initial 'connect to us' command (20 bytes)
     # We need to specify our port and ip address so the robot reaches out to us
     # TODO: change connect command ip to user configured 
@@ -136,6 +138,7 @@ def establishSocket() -> socket.socket:
 def receiveData():
     global TERMINATE
     global SENT_KEEP_ALIVE
+    global AUTH_DONE
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -146,7 +149,8 @@ def receiveData():
             data, addr = sock.recvfrom(1024)
             print("Recevied " + str(data) + " from " + str(addr[0]) + " on port " + str(addr[1]))
             # Check for our special 'send auth' flag
-            if (data == KEEP_ALIVE_1 or data == KEEP_ALIVE_2):
+            # Only start sending back keep alives if we're done with our auth sequence 
+            if ((data == KEEP_ALIVE_1 or data == KEEP_ALIVE_2) and AUTH_DONE):
                 print("Returning keep alive...")
                 sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device 
             elif (data == SEND_AUTH_COMMAND):
@@ -161,6 +165,7 @@ def receiveData():
                 sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
             elif (data == AUTH_ACCEPTED):
                 print("Auth accepted!")
+                AUTH_DONE = True
             else:
                 print("Not sure what this is; echoing it back...")   
                 sock.sendto(data, (addr[0], int(addr[1])))
