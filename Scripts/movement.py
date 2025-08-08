@@ -38,6 +38,7 @@ CONNECT_COMMAND_FOOTER = b'\x00\x00\x00\x00\x00\x00\x00\x00' # last 8 bytes are 
 STARTUP_PACKET = b'\xf1\x41\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
 
 MID_PACKET = b'\xf1\xd1\x00\x0a\xd1\x00\x00\x03\x00\x00\x00\x00\x00\x00'
+MID_PACKET_2 = b'\xf1\xd1\x00\x0c\xd1\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00'
 
 # I think the device may prompt us to send auth with this message, dont echo it 
 SEND_AUTH_COMMAND = b'\xf1\x42\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
@@ -186,6 +187,9 @@ def receiveData():
             elif (data == MID_PACKET):
                 print("Weird 14 byte packet received; echoing back...")
                 sock.sendto(MID_PACKET, (addr[0], int(addr[1])))
+            elif (data == MID_PACKET_2):
+                print("Weird 16 byte packet recevied; echoing back...")
+                sock.sendto(MID_PACKET_2, (addr[0], int(addr[1])))
             # Dont echo back anything else
             else:
                 print("Not sure what this is: " + str(data))   
