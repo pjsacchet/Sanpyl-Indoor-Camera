@@ -181,8 +181,9 @@ def receiveData():
                         sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
                         sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
                         SENT_KEEP_ALIVE = True
-                print("Sending auth blob...")
-                sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
+                    print("Sending auth blob...")
+                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
+                    # TODO: we still send more responses from our phone, not sure if we have to do that here...
             elif (data == AUTH_ACCEPTED):
                 print("Auth accepted!")
                 AUTH_DONE = True
