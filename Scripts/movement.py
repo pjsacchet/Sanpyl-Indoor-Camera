@@ -155,7 +155,7 @@ def main():
         # A lot of data we receive will need to be echoed back I fear
     sock.sendto(constructConnectCommandPacket(), (target_ip, int(port)))
 
-    time.sleep(1) # wait to send our auth blob
+    #time.sleep(1) # wait to send our auth blob
 
     # Send this 'auth blob' type thing we always send on connect 
     sock.sendto(AUTH_BLOB, (target_ip, int(port)))
