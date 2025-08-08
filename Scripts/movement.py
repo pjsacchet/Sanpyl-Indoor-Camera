@@ -13,7 +13,6 @@
 
 import socket
 import threading
-import time
 from pynput import keyboard
 from enum import Enum
 
@@ -33,14 +32,16 @@ CONNECT_COMMAND_FOOTER = b'\x00\x00\x00\x00\x00\x00\x00\x00' # last 8 bytes are 
 SEND_AUTH_COMMAND = b'\xf1\x42\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
 # This seems to be send from the device after sending our auth blob 
 AUTH_ACCEPTED = b'\xf1\xd0\x00\x14\xd1\x00\x00\x00\x03\x80\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x3c\x00\x00\x00'
+# Weird follow up auth blob?
+AUTH_CONTINUE = b''
 
 # Maybe an auth blob? idk
 AUTH_BLOB = b'\xf1\xd0\x00\x48\xd1\x00\x00\x00\x02\x80\x00\x00\x3c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x61\x75\x77\x59\x72\x38\x74\x74\x43\x59\x53\x43\x61\x79\x39\x6b\x6e\x52\x54\x7a\x50\x79\x4a\x47\x4e\x69\x54\x31\x54\x6d\x6c\x34\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
 # Supposed 'keep alive' bytes 
     # Our phone app alternates between these two packets 
-KEEP_ALIVE_1 = b'\xf1\xe1\x00\x00'
-KEEP_ALIVE_2 = b'\xf1\xe0\x00\x00'
+KEEP_ALIVE_1 = b'\xf1\xe0\x00\x00'
+KEEP_ALIVE_2 = b'\xf1\xe1\x00\x00'
 
 # Define the different sections of our 36 byte payload 
 HEADER = b'\xF1\xd0\x00\x20\xd1\x00' # From our analysis only the first 6 bytes are the same for some reason
@@ -146,7 +147,11 @@ def receiveData():
                     print("Returning keep alive...")
                     sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device 
                 elif (data == SEND_AUTH_COMMAND):
-                    print("Sending auth blob...")
+                    print("Sending auth blob and initial echo...")
+                    # Start off by sending three keep alives, I think the device expects these I guess
+                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
                     sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
                 elif (data == AUTH_ACCEPTED):
                     print("Auth accepted!")
@@ -182,7 +187,7 @@ def main():
         # A lot of data we receive will need to be echoed back I fear
     sock.sendto(constructConnectCommandPacket(), (target_ip, int(port)))
 
-    print("Spinning up keypress listener thread... (press ESC to exit)")
+    print("Spinning up keypress listener thread... (press ESC to exit)\n")
 
     # Keep taking input from user, use arrow keys to map to head movement 
     with keyboard.Listener(on_press=lambda event:onPress(event, target_ip=target_ip, port=int(port), sock=sock)) as listener:
