@@ -20,6 +20,8 @@ TERMINATE = False
 # Keep count of the number of commands we've sent; the device seems to like to keep track of the current number we're on 
 DIRECTION_COMMAND_COUTNER = 0
 
+SENT_KEEP_ALIVE = False
+
 # Initial 'connect to us' command (20 bytes)
     # We need to specify our port and ip address so the robot reaches out to us
     # TODO: change connect command ip to user configured 
@@ -133,6 +135,7 @@ def establishSocket() -> socket.socket:
 # Listen on our UDP port for packets from our robot 
 def receiveData():
     global TERMINATE
+    global SENT_KEEP_ALIVE
     while (not TERMINATE):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -147,17 +150,21 @@ def receiveData():
                     print("Returning keep alive...")
                     sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device 
                 elif (data == SEND_AUTH_COMMAND):
-                    print("Sending auth blob and initial echo...")
-                    # Start off by sending three keep alives, I think the device expects these I guess
-                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                    print("Sending auth blob...")
+                    # Start off by sending three keep alives, I think the device expects these I guess (if we havent sent this already)
+                    if (not SENT_KEEP_ALIVE):
+                        print("Sending initial keep alive...")
+                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                        SENT_KEEP_ALIVE = True
                     sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
                 elif (data == AUTH_ACCEPTED):
                     print("Auth accepted!")
                 else:
                     print("Not sure what this is; echoing it back...")   
                     sock.sendto(data, (addr[0], int(addr[1])))
+                global TERMINATE # check condition again?
                 
         except socket.error as e:
             print("ERROR: Failed listener socket " + str(e))
