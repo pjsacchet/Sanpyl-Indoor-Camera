@@ -37,6 +37,7 @@ CONNECT_COMMAND_FOOTER = b'\x00\x00\x00\x00\x00\x00\x00\x00' # last 8 bytes are 
 # Device sends this a ton; once we repond to it initially it will ask us to send auth stuff I think
 STARTUP_PACKET = b'\xf1\x41\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
 
+MID_PACKET = b'\xf1\xd1\x00\x0a\xd1\x00\x00\x03\x00\x00\x00\x00\x00\x00'
 
 # I think the device may prompt us to send auth with this message, dont echo it 
 SEND_AUTH_COMMAND = b'\xf1\x42\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
@@ -181,6 +182,10 @@ def receiveData():
                     sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
                     sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
                     RESPONDED_TO_STARTUP = True
+            # Weird 14 byte packet...
+            elif (data == MID_PACKET):
+                print("Weird 14 byte packet received; echoing back...")
+                sock.sendto(MID_PACKET, (addr[0], int(addr[1])))
             # Dont echo back anything else
             else:
                 print("Not sure what this is: " + str(data))   
