@@ -29,6 +29,8 @@ AUTH_DONE = False
 # Device seems to like to send 3 blobs before we respond?
 COMMAND_BLOBS_SENT = 0
 
+KEEP_ALIVES_RECEIVED = 0
+
 # Initial 'connect to us' command (20 bytes)
     # We need to specify our port and ip address so the robot reaches out to us
     # TODO: change connect command ip to user configured 
@@ -181,8 +183,11 @@ def receiveData():
                         sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
                         sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
                         SENT_KEEP_ALIVE = True
-                    print("Sending auth blob...")
+                    print("Sending auth blobs...")
                     sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
+                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
+                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
+                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
                     # TODO: we still send more responses from our phone, not sure if we have to do that here...
             elif (data == AUTH_ACCEPTED):
                 print("Auth accepted!")
@@ -210,6 +215,8 @@ def receiveData():
                 sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
             elif (data == AUTH_SUCCESS_1):
                 print("AUTH SUCCESS PACKET DETECTED!")
+                # send our auth one more time 
+                #sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
                 sock.sendto(AUTH_SUCCESS_1, (addr[0], int(addr[1])))
             elif (data == AUTH_SUCCESS_2):
                 sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
