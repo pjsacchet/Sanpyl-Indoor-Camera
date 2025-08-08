@@ -20,6 +20,8 @@ TERMINATE = False
 # Keep count of the number of commands we've sent; the device seems to like to keep track of the current number we're on 
 DIRECTION_COMMAND_COUTNER = 0
 
+RESPONDED_TO_STARTUP = False
+
 SENT_KEEP_ALIVE = False
 
 AUTH_DONE = False
@@ -143,6 +145,7 @@ def receiveData():
     global TERMINATE
     global SENT_KEEP_ALIVE
     global AUTH_DONE
+    global RESPONDED_TO_STARTUP
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -151,7 +154,7 @@ def receiveData():
 
         while (not TERMINATE):
             data, addr = sock.recvfrom(1024)
-            print("Recevied " + str(data) + " from " + str(addr[0]) + " on port " + str(addr[1]))
+            #print("Recevied " + str(data) + " from " + str(addr[0]) + " on port " + str(addr[1]))
             # Check for our special 'send auth' flag
             # Only start sending back keep alives if we're done with our auth sequence 
             if ((data == KEEP_ALIVE_1 or data == KEEP_ALIVE_2) and AUTH_DONE):
@@ -171,8 +174,12 @@ def receiveData():
                 print("Auth accepted!")
                 AUTH_DONE = True
             elif (data == STARTUP_PACKET):
-                print("Standard packet received; echoing back....")
-                sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
+                print("Standard packet received....")
+                if (not RESPONDED_TO_STARTUP):
+                    print("Responding to startup sequence...")
+                    sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
+                    sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
+                    sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
             # Dont echo back anything else
             else:
                 print("Not sure what this is: " + str(data))   
