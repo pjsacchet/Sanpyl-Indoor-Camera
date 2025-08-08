@@ -164,7 +164,6 @@ def receiveData():
                 else:
                     print("Not sure what this is; echoing it back...")   
                     sock.sendto(data, (addr[0], int(addr[1])))
-                global TERMINATE # check condition again?
                 
         except socket.error as e:
             print("ERROR: Failed listener socket " + str(e))
