@@ -180,6 +180,7 @@ def receiveData():
                     sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
                     sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
                     sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
+                    RESPONDED_TO_STARTUP = True
             # Dont echo back anything else
             else:
                 print("Not sure what this is: " + str(data))   
