@@ -131,6 +131,7 @@ def establishSocket() -> socket.socket:
 
 # Listen on our UDP port for packets from our robot 
 def receiveData():
+    global TERMINATE
     while (not TERMINATE):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
