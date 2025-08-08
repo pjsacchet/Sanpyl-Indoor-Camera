@@ -186,6 +186,7 @@ def receiveData():
                 sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device
                 # Go ahead and try to startup immediately (after we started our keep alives)
                 if (not SEND_START_COMMAND_PACKET):
+                    print("Sending our device options...")
                     sock.sendto(DEVICE_OPTIONS, (addr[0], int(addr[1])))
                     sock.sendto(DEVICE_OPTIONS_EPILOGUE, (addr[0], int(addr[1])))
                     SEND_START_COMMAND_PACKET = True
