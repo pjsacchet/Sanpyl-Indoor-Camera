@@ -136,37 +136,37 @@ def establishSocket() -> socket.socket:
 def receiveData():
     global TERMINATE
     global SENT_KEEP_ALIVE
-    while (not TERMINATE):
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-            sock.bind(("0.0.0.0", 8888))
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-            while True:
-                data, addr = sock.recvfrom(1024)
-                print("Recevied " + str(data) + " from " + str(addr[0]) + " on port " + str(addr[1]))
-                # Check for our special 'send auth' flag
-                if (data == KEEP_ALIVE_1 or data == KEEP_ALIVE_2):
-                    print("Returning keep alive...")
-                    sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device 
-                elif (data == SEND_AUTH_COMMAND):
-                    print("Sending auth blob...")
-                    # Start off by sending three keep alives, I think the device expects these I guess (if we havent sent this already)
-                    if (not SENT_KEEP_ALIVE):
-                        print("Sending initial keep alive...")
-                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                        sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
-                        SENT_KEEP_ALIVE = True
-                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
-                elif (data == AUTH_ACCEPTED):
-                    print("Auth accepted!")
-                else:
-                    print("Not sure what this is; echoing it back...")   
-                    sock.sendto(data, (addr[0], int(addr[1])))
+        sock.bind(("0.0.0.0", 8888))
+
+        while (not TERMINATE):
+            data, addr = sock.recvfrom(1024)
+            print("Recevied " + str(data) + " from " + str(addr[0]) + " on port " + str(addr[1]))
+            # Check for our special 'send auth' flag
+            if (data == KEEP_ALIVE_1 or data == KEEP_ALIVE_2):
+                print("Returning keep alive...")
+                sock.sendto(data, (addr[0], int(addr[1]))) # echo back to the device 
+            elif (data == SEND_AUTH_COMMAND):
+                print("Sending auth blob...")
+                # Start off by sending three keep alives, I think the device expects these I guess (if we havent sent this already)
+                if (not SENT_KEEP_ALIVE):
+                    print("Sending initial keep alive...")
+                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                    sock.sendto(KEEP_ALIVE_1, (addr[0], int(addr[1])))
+                    SENT_KEEP_ALIVE = True
+                sock.sendto(AUTH_BLOB, (addr[0], int(addr[1]))) 
+            elif (data == AUTH_ACCEPTED):
+                print("Auth accepted!")
+            else:
+                print("Not sure what this is; echoing it back...")   
+                sock.sendto(data, (addr[0], int(addr[1])))
                 
-        except socket.error as e:
-            print("ERROR: Failed listener socket " + str(e))
+    except socket.error as e:
+        print("ERROR: Failed listener socket " + str(e))
     print("Listen thread exiting...")
 
     return
