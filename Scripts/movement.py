@@ -31,6 +31,8 @@ COMMAND_BLOBS_SENT = 0
 
 KEEP_ALIVES_RECEIVED = 0
 
+FIRST_SUCCESS = True
+
 # Initial 'connect to us' command (20 bytes)
     # We need to specify our port and ip address so the robot reaches out to us
     # TODO: change connect command ip to user configured 
@@ -158,6 +160,7 @@ def receiveData():
     global AUTH_DONE
     global RESPONDED_TO_STARTUP
     global COMMAND_BLOBS_SENT
+    global FIRST_SUCCESS
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -216,8 +219,12 @@ def receiveData():
             elif (data == AUTH_SUCCESS_1):
                 print("AUTH SUCCESS PACKET DETECTED!")
                 # send our auth one more time 
-                sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
-                sock.sendto(AUTH_SUCCESS_1, (addr[0], int(addr[1])))
+                if (FIRST_SUCCESS):
+                    sock.sendto(AUTH_BLOB, (addr[0], int(addr[1])))
+                    FIRST_SUCCESS = False
+                else:
+                    sock.sendto(AUTH_SUCCESS_1, (addr[0], int(addr[1])))
+                    sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
             elif (data == AUTH_SUCCESS_2):
                 sock.sendto(AUTH_SUCCESS_2, (addr[0], int(addr[1])))
             # Dont echo back anything else
