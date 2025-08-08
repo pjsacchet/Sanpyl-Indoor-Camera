@@ -32,6 +32,10 @@ CONNECT_COMMAND_PORT =b'\xb8\x22' # next two bytes are for our port number (litt
 CONNECT_COMMAND_IP = b'\x01\x89\xa8\xc0' # next four bytes are for our ip address (little endian) (192.168.137.1)
 CONNECT_COMMAND_FOOTER = b'\x00\x00\x00\x00\x00\x00\x00\x00' # last 8 bytes are all 0
 
+# Device sends this a ton; once we repond to it initially it will ask us to send auth stuff I think
+STARTUP_PACKET = b'\xf1\x41\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
+
+
 # I think the device may prompt us to send auth with this message, dont echo it 
 SEND_AUTH_COMMAND = b'\xf1\x42\x00\x14\x54\x47\x53\x56\x00\x00\x00\x00\x00\x01\x50\xc8\x46\x48\x53\x47\x42\x00\x00\x00'
 # This seems to be send from the device after sending our auth blob 
@@ -166,9 +170,13 @@ def receiveData():
             elif (data == AUTH_ACCEPTED):
                 print("Auth accepted!")
                 AUTH_DONE = True
+            elif (data == STARTUP_PACKET):
+                print("Standard packet received; echoing back....")
+                sock.sendto(STARTUP_PACKET, (addr[0], int(addr[1])))
+            # Dont echo back anything else
             else:
-                print("Not sure what this is; echoing it back...")   
-                sock.sendto(data, (addr[0], int(addr[1])))
+                print("Not sure what this is: " + str(data))   
+                #sock.sendto(data, (addr[0], int(addr[1])))
                 
     except socket.error as e:
         print("ERROR: Failed listener socket " + str(e))
