@@ -85,11 +85,7 @@ One of the more interesting ports would includes port 554, which runs the rtsp p
 
 In the above screenshot, we can see we have live video feed from the device! I also uploaded a sample video below:
 
- <video id="video" width="1280" height="720" controls preload="metadata" crossorigin="anonymous">
-        <source src="https://github.com/pjsacchet/Sanpyl-Indoor-Camera/blob/main/Video_Captures/Stream1_Capture_24JUL25.mkv" type="video/webm">
-        <track label="English" kind="subtitles" srclang="en" src="https://github.com/pjsacchet/Sanpyl-Indoor-Camera/blob/main/Video_Captures/Stream1_Capture_24JUL25.mkv" default>
-        Your browser does not support the video tag.
-    </video>
+<video src='https://github.com/pjsacchet/Sanpyl-Indoor-Camera/blob/main/Video_Captures/Stream1_Capture_24JUL25.mkv' width=600/>
 
 
 - port scanning first 
