@@ -87,7 +87,7 @@ In the above screenshot, we can see we have live video feed from the device! I a
 
 
 
-<video src="https://github.com/pjsacchet/Sanpyl-Indoor-Camera/blob/main/Video_Captures/Stream1_Capture_24JUL25.mkv" width="600"></video>
+<video src="https://www.youtube.com/watch?v=Lpf7vJu0o78" width="600"></video>
 
 - port scanning first 
 - dir buster on port 80
