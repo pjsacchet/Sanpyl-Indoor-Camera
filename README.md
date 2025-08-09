@@ -83,9 +83,43 @@ One of the more interesting ports would includes port 554, which runs the rtsp p
 
 <img src="Screenshots/ffmepg-command-success-capture.png" alt="alt text" width="600"/>
 
-In the above screenshot, we can see we have live video feed from the device! I also uploaded a sample video below:
+In the above screenshot, we can see we have live video feed from the device! I also uploaded a sample video below via the following link (will redirect):
 
 [![Sanpyl Indoor Camera Recording](https://img.youtube.com/vi/Lpf7vJu0o78/0.jpg)](https://www.youtube.com/watch?v=Lpf7vJu0o78)
+
+With video and audio captured, I next set my goals on controlling the device via some python scripting and wireshark for packet capture and analysis. I was able to successfully setup my laptop as a hotspot, and when setting up my device on my phone I simply connected the device to my laptop instead of my Wi-Fi so I could sniff all packets going to and from the device:
+
+<img src="Screenshots/hotspotsetup.png" alt="alt text" width="600"/>
+
+Using Wireshark, I was able to make a number of discoveries regarding the network traffic that goes to and from the device. Firstly, in looking over the startup sequence when I first start the app on my phone, it looks as though the device contacts several servers when initializing its connection:
+
+<img src="Screenshots/startup_sequence.png" alt="alt text" width="600"/>
+
+In the above screenshot, our device (192.168.137.84) reaches out to the following servers before contacting our phone (192.168.1.216):
+
+- 47.88.34.34
+- 173.59.250.28
+- 18.228.15.148
+- 99.79.195.219
+
+However, for those with hunch for detail, will notice the server at 99.79.195.219 reaches out to the device itself. It sends multiple of the displayed 20 byte packets to the device to outline which devices to reach out to. If this is true, we should see a packet detailing the connection to our phone, which we do! To even include its port:
+
+<img src="Screenshots/talk_to_phone_packet.png" alt="text" width="600"/>
+
+In the above screenshot, we see the bytes D801A8C0, which in little endian, would give us the address of 192.168.1.216. Looking at the bytes prior to this address, 6549, would give us 18789, the port in which we see the device reach out to in packet 53! This is incredibly helpful as we will be able to construct our own packet to tell the device to reach out to us later on. Without this information we would not be able to talk to the device. This is due to how the device manages its open port for communication - from analysis, it seems as though this device rotates its port every ~5 minutes, and confirms its open port roughly every 30 seconds with its servers. This would mean for our script to work, we would need to watch the traffic between our device and its servers to dynamically assign a port to reach out to, then have another thread running on the port we tell the device to connect to. We can see the cycles for port monitoring in the screenshots below: 
+
+<img src="Screenshots/possible_port_switch.png" alt="text" width="600"/>
+
+Above: we see the device in packets 3347-3349 announce to its servers its switching ports (from port 18514) to its new port on 24345. In the following screenshot we see the device again switch ports (300 seconds later) from port 24345 to 24288 (packets 3741-3743):
+
+<img src="Screenshots/another_port_switch.png" alt="text" width="600"/>
+
+As a side note, those packets that are 4 bytes in size seem to be keep alive packets (important for later). The sequence of 48 byte packets sent from the device and 12 byte packets sent from the servers is the rough 30 second port alert as mentioned previously. 
+
+After we get the device to reach out to us, it seems as though there are a few exchanges that happen prior to data being sent:
+
+<img src="Screenshots/auth_exchange.png" alt="text" width="600"/>
+
 
 - port scanning first 
 - dir buster on port 80
