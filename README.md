@@ -173,11 +173,35 @@ In our listener callback, we can see how we 'attempted' to construct repsonses t
 
 [![Sanpyl Indoor Camera Script Breakdown](https://img.youtube.com/vi/Og5FnEtsYvQ/0.jpg)](https://www.youtube.com/watch?v=Og5FnEtsYvQ)
 
-- port scanning first 
-- dir buster on port 80
-- ffmpeg on rstp port
-- wireshark on traffic
-- go into pyhton code
+Granted we weren't sadly able to send movement commands to the device, we could at least try to see what we could observe from the mobile app. For this analysis, due to the large size of the APK file, I was unable to perform scans manually and/or locally without running out of memory. Thankfully, MobSF offers web hosting of analysis files, so with our APK uploaded we can see the results of the differnt static scans MobSF performed on our binary. Due to the large amount of results and files, we will briefly cver them here in the interest of time, but all scans and results can be found under Analyses/. The source code for this APK can be found udner /Source_Code/iCam365/Java_Code.zip.
 
+Firstly, MobSF generates a nice overview of the different servers hosted around the world that the app contacts:
+
+<img src="Screenshots/Server_Locations.png" alt="text" width="600"/>
+
+We can also see some fo the permissions this app supposedly violates:
+
+<img src="Screenshots/Abused_Permissions.png" alt="text" width="600"/>
+
+Looking more at some of the analyses files, we see some of the emails used:
+
+<img src="Screenshots/emails.png" alt="text" width="600"/>
+
+As well as some of the vulnerabilities and corresponding standards this app violates:
+
+<img src="Screenshots/vuln_1.png" alt="text" width="600"/>
+
+<img src="Screenshots/vuln_2.png" alt="text" width="600"/>
+
+<img src="Screenshots/vuln_3.png" alt="text" width="600"/>
+
+<img src="Screenshots/vuln_4.png" alt="text" width="600"/>
+
+MobSF also found some hardcoded secrets (only a few listed here):
+
+<img src="Screenshots/hardcoded_secrets.png" alt="text" width="600"/>
+
+In summary, using a tool like MobSF is not only helpful but borderline necessary for analyzing large APK files like iCam365 for our Sanpyl Indoor Camera due to the incredible amount of time that would be required to perform a manual analysis of all source code included and third party libraries. 
 
 ## Results
+In summary, we proved able to identify several vulnerabilities with this device and its associated software, collect video and audio footage from the device, and put together a PoC script that imitates the same unencrypted traffic between servers and this device in an attempt to control it. Overall, there was more to this device than originally anticipated, and I sadly did not accomplish everything I set out to do. This was largely due to time constraints as I changed the device I was exploiting several times throughout the semester, leaving me very little time to fully explore this device and its software. I hope to one day revisit this device to further develop my understanding of both it and general IoT reversing and exploitation. 
