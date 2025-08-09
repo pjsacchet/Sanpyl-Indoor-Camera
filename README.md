@@ -85,8 +85,9 @@ One of the more interesting ports would includes port 554, which runs the rtsp p
 
 In the above screenshot, we can see we have live video feed from the device! I also uploaded a sample video below:
 
-https://github.com/pjsacchet/Sanpyl-Indoor-Camera/blob/main/Video_Captures/Stream1_Capture_24JUL25.mkv
 
+
+<video src="https://github.com/pjsacchet/Sanpyl-Indoor-Camera/blob/main/Video_Captures/Stream1_Capture_24JUL25.mkv" width="600"></video>
 
 - port scanning first 
 - dir buster on port 80
