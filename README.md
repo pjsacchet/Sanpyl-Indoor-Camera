@@ -120,6 +120,58 @@ After we get the device to reach out to us, it seems as though there are a few e
 
 <img src="Screenshots/auth_exchange.png" alt="text" width="600"/>
 
+This, feels to me as though its some kind of rudimentry auth or confirmation exchange, with some keep alive packets sprinkled in. Those 76 byte packets are what I believe hold auth information as shown below:
+
+<img src="Screenshots/auth_packet.png" alt="text" width="600"/>
+
+The following is a sample of a keep alive packet, although they alternate between F1E00000 and F1E10000:
+
+<img src="Screenshots/keepalive_packet.png" alt="text" width="600"/>
+
+The remaining packets are hardcoded, and for the sake of not making this report too long, we wont get into too much detail regarding them. Following this exchange, we have a continuous back and forth of keep alive packets until the user interacts with the device from the app. Once the user opens the camera and physical control panel, another exchange occurs where some hardcoded device options are sent to the device and then the exchange of data takes place:
+
+<img src="Screenshots/start_capture_command.png" alt="text" width="600"/>
+
+From what I could gather and put together, the following packets are commands that the user can send to the device. The following is a 'move up' command packet:
+
+<img src="Screenshots/Movement_Up_Packet.png" alt="text" width="600"/>
+
+'Move down' packet:
+
+<img src="Screenshots/Movement_Down_Packet.png" alt="text" width="600"/>
+
+'Move right' packet:
+
+<img src="Screenshots/Movement_Right_Packet.png" alt="text" width="600"/>
+
+And finally a 'move left' packet:
+
+<img src="Screenshots/Movement_Left_Packet.png" alt="text" width="600"/>
+
+In order to obtain these packets, I really just sent a lot of continous commands to the device from the app and watched for re-occuring patterns within Wireshark. All packets share some similarities, including that all payloads are 36 bytes and start their payload with F1D0 which make them easy to detect. 
+
+With a basic breakdown out of the way, we can now cover some of the code that is within our Scripts/movement.py file. Firstly, in designing this script, I aimed to have two threads running:
+
+1. One to monitor keyboard input from the user, sending movement commands corresponding to the arrow keys
+2. Another to listen on the port we tell the device to connect to (here port 8888)
+
+Once the user hits ESC, the two threads will terminate and the program will exit. The device will continue sending traffic to our laptop until a certain number of keep alive packets are missed and the device goes back to circulating its open port with its servers. The following code is from the main function of the program where we take user input and start our threads:
+
+<img src="Screenshots/main_function.png" alt="text" width="600"/>
+
+We can see here the callback for our threads, receiveData and onPress, which are detailed as follows:
+
+<img src="Screenshots/onpress_callback.png" alt="text" width="600"/>
+
+<img src="Screenshots/listen_callback.png" alt="text" width="600"/>
+
+Depending on the keystroke, our onpress callback will construct an appropiate packet for sending to the device or exit the program:
+
+<img src="Screenshots/construct_command_packet.png" alt="text" width="600"/>
+
+In our listener callback, we can see how we 'attempted' to construct repsonses to the server. A recorded demonstration of the current state of the script can be found at the following address:
+
+[![Sanpyl Indoor Camera Script Breakdown](https://img.youtube.com/vi/Og5FnEtsYvQ/0.jpg)](https://www.youtube.com/watch?v=Og5FnEtsYvQ)
 
 - port scanning first 
 - dir buster on port 80
